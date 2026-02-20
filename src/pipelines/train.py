@@ -4,13 +4,14 @@ import mlflow
 import mlflow.sklearn
 import matplotlib.pyplot as plt
 
-from data_loader import load_data
-from outliers import detect, clean
-from sarima_model import train_sarima
-from evaluate import rmse, mae, mape
+from src.pipelines.data_loader import load_data
+from src.utils.outliers import detect, clean
+from src.models.sarima_model import train_sarima
+from src.pipelines.evaluate import rmse, mae, mape
 
 from prophet import Prophet
 import xgboost as xgb
+
 
 
 # -------------------------
@@ -100,7 +101,7 @@ def log_model_run(name, model, y_true, y_pred):
 
         # save model
         try:
-            mlflow.sklearn.log_model(model, "model")
+            mlflow.sklearn.log_model(model, name="model")
         except:
             pass
 

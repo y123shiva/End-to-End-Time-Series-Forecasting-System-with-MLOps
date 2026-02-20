@@ -16,32 +16,52 @@ venv/
 env/
 
 # -------------------
-# Airflow
+# Airflow (Apache Airflow runtime)
 # -------------------
 airflow/
 .airflow/
-airflow.db
+airflow.db*
 airflow.cfg
 logs/
 
 # -------------------
-# MLflow
+# MLflow (MLflow tracking + artifacts)
 # -------------------
 mlruns/
+mlflow.db
+artifacts/
 *.png
 *.pkl
 *.joblib
 
 # -------------------
-# Data
+# Data (generated)
 # -------------------
 data/raw/
 data/interim/
+data/processed/
 
 # -------------------
-# Environment
+# Model artifacts
+# -------------------
+models/
+checkpoints/
+*.pt
+*.h5
+*.onnx
+
+# -------------------
+# Environment / secrets
 # -------------------
 .env
+.env.*
+
+# -------------------
+# Docker
+# -------------------
+*.log
+*.pid
+docker-data/
 
 # -------------------
 # OS / IDE
