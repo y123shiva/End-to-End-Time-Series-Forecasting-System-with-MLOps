@@ -1,7 +1,3 @@
-Absolutely! Here’s the **final, ready-to-use README**. You can copy & paste it directly into your `README.md`:
-
----
-
 # Time-Series Forecasting with Multi-Model Pipeline
 
 [![Python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
