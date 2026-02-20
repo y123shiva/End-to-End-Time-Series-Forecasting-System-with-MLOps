@@ -176,5 +176,3 @@ mlflow ui --host 0.0.0.0 --port 5001
 * Web dashboard with **visual forecasts** and model comparison
 
 ---
-
-Do you want me to also **add a “Quick Start with Docker” section** so you can run the API + MLflow UI in **one command**?
