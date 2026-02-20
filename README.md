@@ -1,7 +1,3 @@
-Here’s your cleaned, final **README.md** content, ready to copy & paste as-is. It integrates your multi-model forecasting pipeline, FastAPI, MLflow, and Airflow setup:
-
----
-
 # 📈 Financial Time Series Forecasting
 
 This project provides a comprehensive framework for forecasting financial time series data using multiple machine learning models. It includes exploratory data analysis, ML model training, API serving, experiment tracking with MLflow, and orchestration with Apache Airflow.
@@ -240,9 +236,3 @@ MIT License. See LICENSE file for details.
 **y123shiva** – For questions, open an issue on GitHub.
 
 ---
-
-This version is clean, complete, and ready for your repo.
-
-If you want, I can also create a **short “Quick Start” section with Docker + API + MLflow launch in one command** to make it ultra user-friendly.
-
-Do you want me to do that?
