@@ -1,174 +1,248 @@
-# Time-Series Forecasting with Multi-Model Pipeline
-
-[![Python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.101-green)](https://fastapi.tiangolo.com/)
-[![MLflow](https://img.shields.io/badge/MLflow-3.4.1-orange)](https://mlflow.org/)
+Here’s your cleaned, final **README.md** content, ready to copy & paste as-is. It integrates your multi-model forecasting pipeline, FastAPI, MLflow, and Airflow setup:
 
 ---
 
-## 🔹 Overview
+# 📈 Financial Time Series Forecasting
 
-This repository provides a **full-stack time-series forecasting pipeline** supporting multiple models:
-
-* **SARIMA** (classical statistical model)
-* **Prophet** (additive model for time series forecasting)
-* **XGBoost** (lag-based regression approach)
-
-Features:
-
-* Automated model training, evaluation, and logging with **MLflow**
-* Dynamic **FastAPI endpoint** for predictions
-* Safe **multi-model selection** and fallback to the best model
-* Caching and utilities for production-ready deployments
+This project provides a comprehensive framework for forecasting financial time series data using multiple machine learning models. It includes exploratory data analysis, ML model training, API serving, experiment tracking with MLflow, and orchestration with Apache Airflow.
 
 ---
 
-## 📂 Repository Structure
+## 🛠️ Technologies & Stack
+
+* **Language:** Python 3
+* **ML Models:** SARIMA, Prophet, XGBoost
+* **Experiment Tracking:** MLflow
+* **Orchestration:** Apache Airflow
+* **API:** FastAPI
+* **Containerization:** Docker & Docker Compose
+* **Key Libraries:**
+
+  * Pandas, NumPy, Scikit-learn
+  * Statsmodels (SARIMA), Prophet
+  * XGBoost
+  * Matplotlib, Seaborn
+  * MLflow
+
+---
+
+## 📁 Project Structure
 
 ```
-Time-Series-Forecasting/
-├── data/                  # Raw and processed datasets
-├── src/
-│   ├── api/
-│   │   ├── app.py         # FastAPI application
-│   │   └── schemas.py     # Pydantic request/response models
-│   ├── pipelines/
-│   │   ├── train.py       # Training pipeline for SARIMA, Prophet, XGBoost
-│   │   └── evaluate.py    # RMSE, MAE, MAPE functions
-│   ├── models/
-│   │   └── sarima_model.py # SARIMA model training
-│   └── utils/
-│       ├── outliers.py    # Outlier detection & cleaning
-│       ├── cache.py       # Prediction caching
-│       └── model_handler.py # MLflow model loading utilities
-├── Dockerfile
-├── mlflow.db              # SQLite MLflow DB (optional, add to .gitignore)
-├── requirements.txt
-└── README.md
+├── src/                          
+│   ├── api/                      
+│   │   ├── app.py               
+│   │   └── schemas.py           
+│   ├── models/                   
+│   │   ├── sarima_model.py      
+│   │   ├── prophet_model.py     
+│   │   └── xgb_model.py         
+│   ├── pipelines/                
+│   │   ├── train.py             
+│   │   ├── data_loader.py       
+│   │   └── evaluate.py          
+│   ├── utils/                    
+│   │   ├── model_handler.py     
+│   │   ├── features.py          
+│   │   ├── scaler.py            
+│   │   ├── cache.py             
+│   │   └── outliers.py          
+│   └── config.py                
+├── dags/                         
+│   └── forecast_dag.py          
+├── notebooks/                    
+│   └── exploration.ipynb        
+├── tests/                        
+├── data/                         
+│   └── financial_data.csv       
+├── mlruns/                       
+├── airflow/                      
+├── Dockerfile                    
+├── docker-compose.yml            
+├── requirements.txt             
+└── README.md                    
 ```
 
 ---
 
-## ⚡ Features
+## 🔍 Key Features
 
-1. **Multi-Model Forecasting**
+### 1. Exploratory Data Analysis (EDA)
 
-   * Compare SARIMA, Prophet, and XGBoost on the same dataset
-   * Automatically log metrics and plots to MLflow
+* Dataset structure, missing values, outliers visualization
+* Stationarity tests (ADF), ACF/PACF plots
+* Seasonal decomposition and trend analysis
 
-2. **Dynamic Model Serving**
+### 2. Data Preprocessing
 
-   * FastAPI `/predict` endpoint:
+* Log transformation for variance stabilization
+* Outlier detection and smoothing
+* Train/test split (80%/20%)
+* Scaling and feature engineering for ML models
 
-```json
-{
-  "model_name": "XGBoost",
-  "values": [101.2, 102.5, 103.1, 102.8, 103.5, 104, 104.2]
-}
-```
+### 3. Multiple Forecasting Models
 
-* Returns forecasted values and model metadata
+* **SARIMA:** Seasonal ARIMA for stationary/seasonal data
+* **Prophet:** Handles trends, seasonality, holidays, robust to outliers
+* **XGBoost:** Gradient boosting for complex, non-linear patterns
 
-3. **MLflow Integration**
+### 4. Model Evaluation
 
-   * Track experiments, metrics, and artifacts
-   * Automatically register the **best model** and allow fallback
+* RMSE, MAE, MAPE
+* Rolling window cross-validation
+* Multi-model comparison
 
-4. **Production Safety**
+### 5. REST API
 
-   * Validates input length for lag-based models
-   * Caching repeated requests for faster response
+* Serve trained models via FastAPI
+* Prediction endpoints with model selection
+* Request/response validation using Pydantic schemas
+
+### 6. Experiment Tracking
+
+* MLflow for logging models, metrics, and artifacts
+* Model registry and versioning
+
+### 7. Workflow Orchestration
+
+* Airflow DAGs for automated retraining and forecasting
+* Scheduled jobs with error handling and retries
 
 ---
 
-## 🛠 Installation
+## 🚀 Getting Started
+
+### Prerequisites
+
+* Docker & Docker Compose
+* Python 3.8+
+
+### Option 1: Docker Compose
 
 ```bash
-# Clone repo
 git clone https://github.com/y123shiva/Time-Series-Forecasting.git
 cd Time-Series-Forecasting
 
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
+docker-compose up -d
 ```
 
-Optional: Install Git LFS if your repo uses large files:
+* API: [http://localhost:5000](http://localhost:5000)
+* Airflow: [http://localhost:8080](http://localhost:8080)
+* MLflow: [http://localhost:5000](http://localhost:5000)
+
+### Option 2: Local Setup
 
 ```bash
-git lfs install
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 ```
 
----
-
-## 🚀 Running the Training Pipeline
+### Run Training Pipeline
 
 ```bash
 python src/pipelines/train.py
 ```
 
-* Trains SARIMA, Prophet, and XGBoost models
-* Logs metrics and plots to MLflow
-* Registers the **best model** as `financial_forecast_best`
+### Start API Server
+
+```bash
+uvicorn src.api.app:app --reload --host 0.0.0.0 --port 5000
+```
+
+### Start MLflow UI
+
+```bash
+mlflow ui --host 0.0.0.0 --port 5000
+```
+
+### Start Airflow
+
+```bash
+export AIRFLOW_HOME=$(pwd)/airflow
+airflow db init
+airflow webserver --port 8080
+airflow scheduler
+```
 
 ---
 
-## 🖥 Running the API
+## 📊 Model Comparison
+
+| Model   | Approach            | Strengths                                              | Best For                                   |
+| ------- | ------------------- | ------------------------------------------------------ | ------------------------------------------ |
+| SARIMA  | Statistical         | Interpretable, seasonal patterns, confidence intervals | Stable seasonal data, economic indicators  |
+| Prophet | Trend + Seasonality | Robust to outliers, handles holidays, simple tuning    | Business metrics, web traffic              |
+| XGBoost | ML-based            | Non-linear patterns, high accuracy, feature importance | Complex relationships, high-frequency data |
+
+---
+
+## 📈 Sample API Usage
 
 ```bash
-# Start FastAPI server
-uvicorn src.api.app:app --reload --host 0.0.0.0 --port 8000
+# SARIMA forecast
+curl -X POST http://localhost:5000/api/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model_name": "SARIMA",
+    "values": [101.2, 102.5, 103.1, 102.8, 103.5, 104, 104.2]
+  }'
 ```
-
-* API Docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-* Example POST request:
-
-```json
-{
-  "model_name": "XGBoost",
-  "values": [101.2, 102.5, 103.1, 102.8, 103.5, 104, 104.2]
-}
-```
-
-* Example response:
 
 ```json
 {
   "predictions": [106.07, 106.49, 109.03, ...],
-  "model_name": "XGBoost"
+  "model_name": "SARIMA"
 }
 ```
 
 ---
 
-## 📈 MLflow UI
+## ⚙️ Configuration
 
-Start MLflow UI:
+Edit `src/config.py` to adjust:
+
+* Model hyperparameters (SARIMA, Prophet, XGBoost)
+* Data paths
+* API settings
+* MLflow URI and registry
+* Airflow DAG intervals
+
+---
+
+## 🧪 Testing
 
 ```bash
-mlflow ui --host 0.0.0.0 --port 5001
+pytest tests/ --cov=src
 ```
 
-* Dashboard: [http://127.0.0.1:5001](http://127.0.0.1:5001)
-* View experiments, registered models, and plots
+---
+
+## 📝 Contributing
+
+1. Fork repo → `git checkout -b feature/your-feature`
+2. Commit changes → `git commit -am "Add feature"`
+3. Push branch → `git push origin feature/your-feature`
+4. Submit a pull request
 
 ---
 
-## 📝 Notes
+## 📄 License
 
-* **Do not commit `mlflow.db`** — add it to `.gitignore`
-* Minimum 7 historical values are required for XGBoost predictions
-* Prophet and SARIMA models can handle full historical series dynamically
+MIT License. See LICENSE file for details.
 
 ---
 
-## 💡 Future Enhancements
+## 👨‍💻 Author
 
-* Auto-scaling FastAPI with Docker/Kubernetes
-* Include **confidence intervals** for forecasts
-* Web dashboard with **visual forecasts** and model comparison
+**y123shiva** – For questions, open an issue on GitHub.
 
 ---
+
+This version is clean, complete, and ready for your repo.
+
+If you want, I can also create a **short “Quick Start” section with Docker + API + MLflow launch in one command** to make it ultra user-friendly.
+
+Do you want me to do that?
