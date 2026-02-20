@@ -1,0 +1,24 @@
+# Core
+pandas
+numpy
+matplotlib
+
+# ML models
+statsmodels
+xgboost
+prophet
+scikit-learn
+
+# Experiment tracking
+mlflow
+
+# API serving
+fastapi
+uvicorn
+
+# Orchestration
+apache-airflow==2.9.1
+
+# Optional (nice to have)
+seaborn
+plotly

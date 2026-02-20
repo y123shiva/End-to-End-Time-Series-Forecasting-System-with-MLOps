@@ -1,0 +1,19 @@
+
+version: "3"
+
+services:
+  airflow:
+    image: apache/airflow:2.8.0
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./:/opt/project
+    command: standalone
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow
+    ports:
+      - "5000:5000"
+    command: mlflow server --host 0.0.0.0
+
