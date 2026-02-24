@@ -1,3 +1,4 @@
+# dashboard/dashboard.py
 import streamlit as st
 import pandas as pd
 from pathlib import Path
@@ -17,7 +18,7 @@ df = pd.read_csv(data_file, parse_dates=["Date"], dayfirst=True)
 df = df.sort_values("Date")
 
 # -----------------------------
-# Dashboard title
+# Streamlit dashboard title
 # -----------------------------
 st.title("📈 Interactive Financial Price Dashboard")
 
@@ -30,19 +31,28 @@ st.sidebar.header("Filters & Options")
 min_date = df["Date"].min()
 max_date = df["Date"].max()
 start_date, end_date = st.sidebar.date_input(
-    "Select Date Range", value=[min_date, max_date], min_value=min_date, max_value=max_date
+    "Select Date Range",
+    value=[min_date, max_date],
+    min_value=min_date,
+    max_value=max_date
 )
 
 # Rolling average window
-rolling_window = st.sidebar.slider("7-day rolling average window", 1, 30, 7)
+rolling_window = st.sidebar.slider(
+    "Rolling Average Window (days)",
+    min_value=1,
+    max_value=30,
+    value=7
+)
 
 # Filter dataframe based on date range
-df_filtered = df[(df["Date"] >= pd.to_datetime(start_date)) & (df["Date"] <= pd.to_datetime(end_date))].copy()
+df_filtered = df[(df["Date"] >= pd.to_datetime(start_date)) &
+                 (df["Date"] <= pd.to_datetime(end_date))].copy()
 df_filtered[f"{rolling_window}d_avg"] = df_filtered["Price"].rolling(rolling_window).mean()
 df_filtered["Price_diff"] = df_filtered["Price"].diff()
 
 # -----------------------------
-# Show filtered raw data
+# Display filtered raw data
 # -----------------------------
 st.subheader("Filtered Raw Data")
 st.dataframe(df_filtered)
@@ -65,7 +75,8 @@ plt.close(fig)
 st.subheader(f"Price Trend with {rolling_window}-day Rolling Average")
 fig, ax = plt.subplots(figsize=(12,6))
 sns.lineplot(data=df_filtered, x="Date", y="Price", label="Price", marker="o", ax=ax)
-sns.lineplot(data=df_filtered, x="Date", y=f"{rolling_window}d_avg", label=f"{rolling_window}-day Avg", color="red", ax=ax)
+sns.lineplot(data=df_filtered, x="Date", y=f"{rolling_window}d_avg",
+             label=f"{rolling_window}-day Avg", color="red", ax=ax)
 plt.xticks(rotation=45)
 plt.title(f"Price Trend with {rolling_window}-day Rolling Average")
 plt.legend()
