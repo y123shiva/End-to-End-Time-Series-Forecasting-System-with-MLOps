@@ -3,7 +3,8 @@ import pandas as pd
 from PIL import Image
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+from pathlib import Path
+import streamlit as st
 # Load data
 import os
 
@@ -23,7 +24,16 @@ st.dataframe(df)
 
 # Display static images
 st.subheader("Daily Price Trend")
-st.image("../images/daily_price_trend.png", use_column_width=True)
+
+
+# Get project root
+BASE_DIR = Path(__file__).resolve().parents[1]
+
+# Correct image path
+img_file = BASE_DIR / "images" / "daily_price_trend.png"
+
+# Display image
+st.image(img_file, use_column_width=True)
 
 st.subheader("Price Trend with 7-day Rolling Average")
 st.image("../images/price_rolling_avg.png", use_column_width=True)
