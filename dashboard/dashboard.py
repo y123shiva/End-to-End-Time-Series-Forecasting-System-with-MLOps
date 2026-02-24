@@ -1,45 +1,49 @@
 import streamlit as st
 import pandas as pd
+from pathlib import Path
 from PIL import Image
 import matplotlib.pyplot as plt
 import seaborn as sns
-from pathlib import Path
-import streamlit as st
-# Load data
-import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-file_path = os.path.join(BASE_DIR, "data", "financial_data.csv")
+# -----------------------------
+# Set up project root and file paths
+# -----------------------------
+BASE_DIR = Path(__file__).resolve().parents[1]
 
-df = pd.read_csv(file_path, parse_dates=['Date'], dayfirst=True)
+# Data file
+data_file = BASE_DIR / "data" / "financial_data.csv"
+
+# Image files
+img_daily_trend = BASE_DIR / "images" / "daily_price_trend.png"
+img_rolling_avg = BASE_DIR / "images" / "price_rolling_avg.png"
+img_price_change = BASE_DIR / "images" / "price_change_dist.png"
+
+# -----------------------------
+# Load and preprocess data
+# -----------------------------
+df = pd.read_csv(data_file, parse_dates=['Date'], dayfirst=True)
 df = df.sort_values('Date')
 df['7d_avg'] = df['Price'].rolling(7).mean()
 df['Price_diff'] = df['Price'].diff()
 
+# -----------------------------
+# Streamlit Dashboard
+# -----------------------------
 st.title("Financial Price Time Series Dashboard")
 
-# Show raw data
+# Raw data
 st.subheader("Raw Data")
 st.dataframe(df)
 
-# Display static images
+# Static images
 st.subheader("Daily Price Trend")
-
-
-# Get project root
-BASE_DIR = Path(__file__).resolve().parents[1]
-
-# Correct image path
-img_file = BASE_DIR / "images" / "daily_price_trend.png"
-
-# Display image
-st.image(img_file, use_column_width=True)
+st.image(img_daily_trend, use_column_width=True)
 
 st.subheader("Price Trend with 7-day Rolling Average")
-st.image("../images/price_rolling_avg.png", use_column_width=True)
+st.image(img_rolling_avg, use_column_width=True)
 
 st.subheader("Distribution of Daily Price Changes")
-st.image("../images/price_change_dist.png", use_column_width=True)
+st.image(img_price_change, use_column_width=True)
 
 # Interactive plot
 st.subheader("Interactive Price Trend")
