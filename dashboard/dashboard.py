@@ -1,55 +1,87 @@
 import streamlit as st
 import pandas as pd
 from pathlib import Path
-from PIL import Image
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 # -----------------------------
-# Set up project root and file paths
+# Project root & data path
 # -----------------------------
-BASE_DIR = Path(__file__).resolve().parents[1]
-
-# Data file
+BASE_DIR = Path(__file__).resolve().parents[1]  # project root
 data_file = BASE_DIR / "data" / "financial_data.csv"
 
-# Image files
-img_daily_trend = BASE_DIR / "images" / "daily_price_trend.png"
-img_rolling_avg = BASE_DIR / "images" / "price_rolling_avg.png"
-img_price_change = BASE_DIR / "images" / "price_change_dist.png"
+# -----------------------------
+# Load data
+# -----------------------------
+df = pd.read_csv(data_file, parse_dates=["Date"], dayfirst=True)
+df = df.sort_values("Date")
 
 # -----------------------------
-# Load and preprocess data
+# Dashboard title
 # -----------------------------
-df = pd.read_csv(data_file, parse_dates=['Date'], dayfirst=True)
-df = df.sort_values('Date')
-df['7d_avg'] = df['Price'].rolling(7).mean()
-df['Price_diff'] = df['Price'].diff()
+st.title("📈 Interactive Financial Price Dashboard")
 
 # -----------------------------
-# Streamlit Dashboard
+# Sidebar controls
 # -----------------------------
-st.title("Financial Price Time Series Dashboard")
+st.sidebar.header("Filters & Options")
 
-# Raw data
-st.subheader("Raw Data")
-st.dataframe(df)
+# Date range filter
+min_date = df["Date"].min()
+max_date = df["Date"].max()
+start_date, end_date = st.sidebar.date_input(
+    "Select Date Range", value=[min_date, max_date], min_value=min_date, max_value=max_date
+)
 
-# Static images
+# Rolling average window
+rolling_window = st.sidebar.slider("7-day rolling average window", 1, 30, 7)
+
+# Filter dataframe based on date range
+df_filtered = df[(df["Date"] >= pd.to_datetime(start_date)) & (df["Date"] <= pd.to_datetime(end_date))].copy()
+df_filtered[f"{rolling_window}d_avg"] = df_filtered["Price"].rolling(rolling_window).mean()
+df_filtered["Price_diff"] = df_filtered["Price"].diff()
+
+# -----------------------------
+# Show filtered raw data
+# -----------------------------
+st.subheader("Filtered Raw Data")
+st.dataframe(df_filtered)
+
+# -----------------------------
+# Daily Price Trend
+# -----------------------------
 st.subheader("Daily Price Trend")
-st.image(img_daily_trend, use_column_width=True)
-
-st.subheader("Price Trend with 7-day Rolling Average")
-st.image(img_rolling_avg, use_column_width=True)
-
-st.subheader("Distribution of Daily Price Changes")
-st.image(img_price_change, use_column_width=True)
-
-# Interactive plot
-st.subheader("Interactive Price Trend")
 fig, ax = plt.subplots(figsize=(12,6))
-sns.lineplot(data=df, x='Date', y='Price', marker='o', label='Price', ax=ax)
-sns.lineplot(data=df, x='Date', y='7d_avg', label='7-day Avg', color='red', ax=ax)
+sns.lineplot(data=df_filtered, x="Date", y="Price", marker="o", ax=ax)
 plt.xticks(rotation=45)
+plt.title("Daily Price Trend")
 plt.tight_layout()
 st.pyplot(fig)
+plt.close(fig)
+
+# -----------------------------
+# Price Trend with Rolling Average
+# -----------------------------
+st.subheader(f"Price Trend with {rolling_window}-day Rolling Average")
+fig, ax = plt.subplots(figsize=(12,6))
+sns.lineplot(data=df_filtered, x="Date", y="Price", label="Price", marker="o", ax=ax)
+sns.lineplot(data=df_filtered, x="Date", y=f"{rolling_window}d_avg", label=f"{rolling_window}-day Avg", color="red", ax=ax)
+plt.xticks(rotation=45)
+plt.title(f"Price Trend with {rolling_window}-day Rolling Average")
+plt.legend()
+plt.tight_layout()
+st.pyplot(fig)
+plt.close(fig)
+
+# -----------------------------
+# Distribution of Daily Price Changes
+# -----------------------------
+st.subheader("Distribution of Daily Price Changes")
+fig, ax = plt.subplots(figsize=(10,5))
+sns.histplot(df_filtered["Price_diff"].dropna(), bins=30, kde=True, ax=ax)
+plt.title("Distribution of Daily Price Changes")
+plt.xlabel("Daily Price Change")
+plt.ylabel("Frequency")
+plt.tight_layout()
+st.pyplot(fig)
+plt.close(fig)
