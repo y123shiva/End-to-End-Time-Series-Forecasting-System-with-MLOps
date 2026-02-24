@@ -192,6 +192,9 @@ Visit:
 http://localhost:8000/docs
 ```
 
+You can also trigger a full retraining via the API by POSTing to `/train`.
+The Swagger UI shows the new endpoint once the server is running.
+
 ---
 
 ## 5️⃣ Launch Dashboard

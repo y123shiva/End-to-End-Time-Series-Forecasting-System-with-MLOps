@@ -5,6 +5,7 @@ import mlflow.sklearn
 import mlflow.prophet
 import matplotlib.pyplot as plt
 import time
+from typing import Optional
 
 from src.pipelines.data_loader import load_data
 from src.utils.outliers import detect, clean
@@ -15,7 +16,8 @@ from src.config import (
     PROPHET_CONFIG, XGBOOST_CONFIG, MODEL_REGISTRY_STAGES
 )
 
-from prophet import Prophet
+# prophet is imported lazily within the training function below to
+# avoid heavy dependencies during light-weight imports (e.g. tests). 
 import xgboost as xgb
 
 # -------------------------
@@ -34,6 +36,9 @@ def create_lags(series, n_lags=7):
 # -------------------------
 
 def train_prophet(df, test_size):
+    # lazy import so the module can be imported in lightweight contexts
+    from prophet import Prophet
+
     df = df.copy().reset_index()
     df.columns = ["ds", "y"]
     df['ds'] = pd.to_datetime(df['ds'])
@@ -126,7 +131,15 @@ def load_model_safe(model_name: str):
 # MAIN PIPELINE
 # -------------------------
 
-def run():
+def run(model_name: Optional[str] = None):
+    """Main training pipeline.
+
+    If **model_name** is supplied it is currently ignored and the full multi-model
+    comparison is executed; the parameter exists for future extension.
+
+    Returns a summary dictionary containing the per-model scores and the name of
+    the best model so that callers (e.g. a web API) can present results programmatically.
+    """
     mlflow.set_experiment("financial_forecast_multi_model")
     df = load_data("data/financial_data.csv")
     series = df["Price"]
@@ -258,6 +271,21 @@ def run():
             print(f"{k:12} → FAILED")
     print(f"\n🏆 Best Model: {best_model_name}")
     print("="*50)
+
+    # sanitize scores: JSON cannot represent infinite values so convert
+    # to None before returning to any callers (e.g. API response)
+    def _sanitize(val):
+        import math
+        if isinstance(val, float) and not math.isfinite(val):
+            return None
+        return val
+
+    clean_scores = {}
+    for m, met in scores.items():
+        clean_scores[m] = {k: _sanitize(v) for k, v in met.items()}
+
+    # return summary for callers
+    return {"scores": clean_scores, "best_model": best_model_name}
 
 if __name__ == "__main__":
     run()

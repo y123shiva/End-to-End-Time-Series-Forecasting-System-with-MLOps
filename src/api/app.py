@@ -2,9 +2,12 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, Query
 from typing import Optional, Dict
 import mlflow.pyfunc
-from src.api.schemas import PredictRequest, PredictResponse
+from src.api.schemas import PredictRequest, PredictResponse, TrainRequest, TrainResponse, default_train_message
 from src.utils.cache import lru_forecast_cache
 from src.utils.model_handler import ModelHandler
+
+# training helper
+from src.pipelines.train import run
 
 N_LAGS = 7
 AVAILABLE_MODELS = ["SARIMA", "Prophet", "XGBoost"]
@@ -88,8 +91,15 @@ app = FastAPI(
 
 @app.get("/")
 def health():
-    """Health check endpoint."""
-    return {"status": "ok", "available_models": AVAILABLE_MODELS}
+    """Health check endpoint.
+
+    Includes a quick view of what functionality is reachable.
+    """
+    return {
+        "status": "ok",
+        "available_models": AVAILABLE_MODELS,
+        "endpoints": ["/predict", "/forecast", "/train"]
+    }
 
 # -------------------------
 # Cached prediction function
@@ -155,3 +165,30 @@ def forecast(req: PredictRequest, horizon: int = Query(30, gt=0, le=MAX_FORECAST
     
     preds = cached_forecast(tuple(req.values), model_name, horizon=horizon)
     return PredictResponse(predictions=preds, model_name=model_name)
+
+# -------------------------
+# /train → retrigger model training
+# -------------------------
+@app.post("/train", response_model=TrainResponse)
+def train(req: TrainRequest):
+    """Launch the training pipeline and return summary of results.
+
+    The endpoint is intentionally simple; training may take several seconds and
+    is meant for manual triggering or lightweight automation. The request
+    payload currently allows specifying a target `model_name` which is ignored
+    by the backend (full pipeline always runs) but reserved for future filtering.
+    """
+    # ensure synchronous behaviour - caller will wait until pipeline completes
+    try:
+        summary = run(model_name=req.model_name)
+        response = {
+            "success": True,
+            "message": default_train_message,
+            "best_model": summary.get("best_model"),
+            "metrics": summary.get("scores"),
+        }
+    except Exception as e:
+        # propagate errors as 500 with text
+        raise HTTPException(status_code=500, detail=f"Training failed: {e}")
+
+    return response
