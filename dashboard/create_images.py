@@ -3,7 +3,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv("../data/financial_data.csv", parse_dates=['Date'], dayfirst=True)
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+file_path = os.path.join(BASE_DIR, "data", "financial_data.csv")
+
+df = pd.read_csv(file_path, parse_dates=['Date'], dayfirst=True)
 df = df.sort_values('Date')
 
 # 1️⃣ Daily Price Trend
