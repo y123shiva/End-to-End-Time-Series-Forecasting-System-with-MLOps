@@ -6,6 +6,7 @@ numpy>=2.4
 matplotlib>=3.10
 seaborn>=0.13
 plotly>=6.5
+altair==4.2.2  # fixed version for Streamlit compatibility
 
 # -------------------------------
 # Machine Learning / Time Series
@@ -35,10 +36,3 @@ apache-airflow==2.9.1
 # Streamlit for dashboard
 # -------------------------------
 streamlit>=1.18
-
-# -------------------------------
-# Optional / Utilities
-# -------------------------------
-python-dateutil>=2.9
-pillow>=12
-tzdata>=2025.3
