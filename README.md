@@ -314,8 +314,8 @@ Ideal for:
 
 Machine Learning Engineer | Time Series | MLOps | APIs
 
-* GitHub: 
-* LinkedIn: your-profile
+* GitHub: github.com/y123shiva
+* LinkedIn: linkedin.com/in/shivani-yadav-245031b8
 
 ---
 
